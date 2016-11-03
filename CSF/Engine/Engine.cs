@@ -8,5 +8,17 @@ namespace Engine
 {
     public class Engine
     {
+        private SapoMailServer sapoMailServer { set; get; } = null;
+
+        /// <summary>
+        /// Engine should test each server and choose the one which gives the most significant data.
+        /// </summary>
+        public Engine(string mailHeader) {
+            sapoMailServer = new SapoMailServer(mailHeader);
+        }
+
+        public string getEngineOutput() {
+            return sapoMailServer.getAllTags();
+        }
     }
 }

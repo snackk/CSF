@@ -12,9 +12,34 @@ namespace ClientUI
 {
     public partial class ClientUIForm : Form
     {
+        private Engine.Engine engine = null;
+
         public ClientUIForm()
         {
             InitializeComponent();
+        }
+
+        private void decodeButton_Click(object sender, EventArgs e)
+        {
+            String text = null;
+
+            text = this.textBoxEmailHeader.Text;
+            if (!text.Equals(""))
+            {
+                engine = new Engine.Engine(text);
+                outputTextBox.Text = engine.getEngineOutput();
+            }
+            else outputTextBox.Text = "";
+        }
+
+        private void textBoxEmailHeader_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textOutput_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
