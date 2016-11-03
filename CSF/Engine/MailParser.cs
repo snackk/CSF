@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Engine
@@ -52,27 +53,48 @@ namespace Engine
         /// <summary>
         /// Returns the parsed data from a variable.
         /// </summary>
-        private string parseData(String tag) {
-            int index = emailHeader.IndexOf(tag);
-            string parsed = "";
-            if (index != -1)
-            {
-                parsed = emailHeader.Substring(index + tag.Length);
-            }
-            return parsed;
-        }
+        private void parseAllTags() {
+            int index;
+            string[] header_lines = Regex.Split(emailHeader, "\r\n|\r|\n");
 
-        /// <summary>
-        /// Parses and store all Tags.
-        /// </summary>
-        public void parseAllTags() {
-            mailServerIP = parseData(tagMailServerIP);
-            messageID = parseData(tagMessageID);
-            from = parseData(tagFrom);
-            fromIP = parseData(tagFromIP);
-            userAgent = parseData(tagUserAgent);
-            mailVersion = parseData(tagMailVersion);
-            mailUser = parseData(tagMailUser);
+            foreach(string hl in header_lines) {
+
+                if (hl.Contains(tagMailServerIP)) {
+                    index = hl.IndexOf(tagMailServerIP);
+                    mailServerIP = hl.Substring(index + tagMailServerIP.Length);
+                }
+                if (hl.Contains(tagMessageID))
+                {
+                    index = hl.IndexOf(tagMessageID);
+                    messageID = hl.Substring(index + tagMessageID.Length);
+                }
+                if (hl.Contains(tagFrom))
+                {
+                    index = hl.IndexOf(tagFrom);
+                    from = hl.Substring(index + tagFrom.Length);
+                }
+                if (hl.Contains(tagFromIP))
+                {
+                    index = hl.IndexOf(tagFromIP);
+                    fromIP = hl.Substring(index + tagFromIP.Length);
+                }
+                if (hl.Contains(tagUserAgent))
+                {
+                    index = hl.IndexOf(tagUserAgent);
+                    userAgent = hl.Substring(index + tagUserAgent.Length);
+                }
+                if (hl.Contains(tagMailVersion))
+                {
+                    index = hl.IndexOf(tagMailVersion);
+                    mailVersion = hl.Substring(index + tagMailVersion.Length);
+                }
+                if (hl.Contains(tagMailUser))
+                {
+                    index = hl.IndexOf(tagMailUser);
+                    mailUser = hl.Substring(index + tagMailUser.Length);
+                }
+            }
+
         }
 
         /// <summary>
@@ -87,5 +109,7 @@ namespace Engine
                 "Mail Version: " + mailVersion + System.Environment.NewLine +
                 "Mail User: " + mailUser + System.Environment.NewLine;
         }
+
+        
     }
 }
