@@ -8,17 +8,7 @@ namespace Engine
 {
     class SapoMailServer : MailParser
     {
-        public SapoMailServer(string emailHeader) : base(emailHeader)
-        {
-            base.tagMailServerIP = "X-PTMail-RemoteIP:";
-            base.tagMessageID = "Message-ID:";
-            base.tagFrom = "From:";
-            base.tagFromIP = "X-Originating-IP:";
-            base.tagUserAgent = "User-Agent:";
-            base.tagMailVersion = "X-PTMail-Version:";
-            base.tagMailUser = "X-PTMail-User:";
-
-            parseAllTags();
-        }
+        public SapoMailServer(string emailHeader) : base(emailHeader, "X-PTMail-RemoteIP:", "Message-ID:", "From:",
+                                                    "X-Originating-IP:", "User-Agent:", "X-PTMail-Version:", "X-PTMail-User:"){ }
     }
 }

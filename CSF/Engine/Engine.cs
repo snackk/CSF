@@ -17,6 +17,9 @@ namespace Engine
             sapoMailServer = new SapoMailServer(mailHeader);
         }
 
+        /// <summary>
+        /// Get a string of all tags.
+        /// </summary>
         public string getEngineOutput() {
             return sapoMailServer.getAllTags();
         }

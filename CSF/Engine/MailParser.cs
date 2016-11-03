@@ -9,6 +9,8 @@ namespace Engine
     abstract class MailParser
     {
         public string emailHeader { private set; get; }
+
+        //Variables after parsing the emailHeader
         public string mailServerIP { private set; get;}
         public string messageID { private set; get; }
         public string from { private set; get; }
@@ -17,24 +19,38 @@ namespace Engine
         public string mailVersion { private set; get; }
         public string mailUser { private set; get; }
 
-        public string tagEmailHeader { set; get; }
-        public string tagMailServerIP { set; get; }
-        public string tagMessageID { set; get; }
-        public string tagFrom { set; get; }
-        public string tagFromIP { set; get; }
-        public string tagUserAgent { set; get; }
-        public string tagMailVersion { set; get; }
-        public string tagMailUser { set; get; }
+        //Variables to know what to parse from
+        public string tagEmailHeader { private set; get; }
+        public string tagMailServerIP { private set; get; }
+        public string tagMessageID { private set; get; }
+        public string tagFrom { private set; get; }
+        public string tagFromIP { private set; get; }
+        public string tagUserAgent { private set; get; }
+        public string tagMailVersion { private set; get; }
+        public string tagMailUser { private set; get; }
 
         /// <summary>
-        /// explain each argument.
+        /// Input: emailHeader & Email header tags
+        /// Stores: All the header's data
         /// </summary>
-        public MailParser(string emailHeader) {
+        public MailParser(string emailHeader, string _tagMailServerIP, string _tagMessageID, string _tagFrom,
+                        string _tagFromIP, string _tagUserAgent, string _tagMailVersion, string _tagMailUser) {
+
             this.emailHeader = emailHeader;
+
+            this.tagMailServerIP = _tagMailServerIP;
+            this.tagMessageID = _tagMessageID;
+            this.tagFrom = _tagFrom;
+            this.tagFromIP = _tagFromIP;
+            this.tagUserAgent = _tagUserAgent;
+            this.tagMailVersion = _tagMailVersion;
+            this.tagMailUser = _tagMailUser;
+
+            parseAllTags();
         }
 
         /// <summary>
-        /// explain each argument.
+        /// Returns the parsed data from a variable.
         /// </summary>
         private string parseData(String tag) {
             int index = emailHeader.IndexOf(tag);
@@ -46,6 +62,9 @@ namespace Engine
             return parsed;
         }
 
+        /// <summary>
+        /// Parses and store all Tags.
+        /// </summary>
         public void parseAllTags() {
             mailServerIP = parseData(tagMailServerIP);
             messageID = parseData(tagMessageID);
@@ -56,6 +75,9 @@ namespace Engine
             mailUser = parseData(tagMailUser);
         }
 
+        /// <summary>
+        /// Return all tags by string
+        /// </summary>
         public virtual string getAllTags() {
             return "Server IP: " + mailServerIP + System.Environment.NewLine +
                 "Message ID: " + messageID + System.Environment.NewLine +
@@ -64,9 +86,6 @@ namespace Engine
                 "User Agent: " + userAgent + System.Environment.NewLine +
                 "Mail Version: " + mailVersion + System.Environment.NewLine +
                 "Mail User: " + mailUser + System.Environment.NewLine;
-        }
-
-        public void Delete() {
         }
     }
 }

@@ -40,16 +40,16 @@
             this.textBoxEmailHeader.Location = new System.Drawing.Point(12, 32);
             this.textBoxEmailHeader.Name = "textBoxEmailHeader";
             this.textBoxEmailHeader.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedBoth;
-            this.textBoxEmailHeader.Size = new System.Drawing.Size(448, 187);
+            this.textBoxEmailHeader.Size = new System.Drawing.Size(918, 224);
             this.textBoxEmailHeader.TabIndex = 0;
             this.textBoxEmailHeader.Text = "";
             this.textBoxEmailHeader.TextChanged += new System.EventHandler(this.textBoxEmailHeader_TextChanged);
             // 
             // decodeButton
             // 
-            this.decodeButton.Location = new System.Drawing.Point(466, 32);
+            this.decodeButton.Location = new System.Drawing.Point(936, 32);
             this.decodeButton.Name = "decodeButton";
-            this.decodeButton.Size = new System.Drawing.Size(87, 187);
+            this.decodeButton.Size = new System.Drawing.Size(87, 224);
             this.decodeButton.TabIndex = 1;
             this.decodeButton.Text = "Get Properties";
             this.decodeButton.UseVisualStyleBackColor = true;
@@ -68,11 +68,11 @@
             // 
             // outputTextBox
             // 
-            this.outputTextBox.Location = new System.Drawing.Point(12, 254);
+            this.outputTextBox.Location = new System.Drawing.Point(12, 305);
             this.outputTextBox.Multiline = true;
             this.outputTextBox.Name = "outputTextBox";
             this.outputTextBox.ReadOnly = true;
-            this.outputTextBox.Size = new System.Drawing.Size(448, 155);
+            this.outputTextBox.Size = new System.Drawing.Size(1011, 179);
             this.outputTextBox.TabIndex = 5;
             // 
             // label1
@@ -80,7 +80,7 @@
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.ForeColor = System.Drawing.Color.Navy;
-            this.label1.Location = new System.Drawing.Point(8, 231);
+            this.label1.Location = new System.Drawing.Point(8, 270);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(64, 20);
             this.label1.TabIndex = 6;
@@ -90,7 +90,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(565, 421);
+            this.ClientSize = new System.Drawing.Size(1035, 496);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.outputTextBox);
             this.Controls.Add(this.textInputLabel);
