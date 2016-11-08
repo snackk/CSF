@@ -8,20 +8,20 @@ namespace Engine
 {
     public class Engine
     {
-        private SapoMailServer sapoMailServer { set; get; } = null;
+        private MailParser server { set; get; } = null;
 
         /// <summary>
         /// Engine should test each server and choose the one which gives the most significant data.
         /// </summary>
         public Engine(string mailHeader) {
-            sapoMailServer = new SapoMailServer(mailHeader);
+            server = new HotmailMailServer(mailHeader);
         }
 
         /// <summary>
         /// Get a string of all tags.
         /// </summary>
         public string getEngineOutput() {
-            return sapoMailServer.getAllTags();
+            return server.getAllTags();
         }
     }
 }

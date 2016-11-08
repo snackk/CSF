@@ -61,7 +61,7 @@ namespace Engine
 
                 if (hl.Contains(tagMailServerIP)) {
                     index = hl.IndexOf(tagMailServerIP);
-                    mailServerIP = hl.Substring(index + tagMailServerIP.Length);
+                    mailServerIP += hl.Substring(index + tagMailServerIP.Length) + System.Environment.NewLine;
                 }
                 if (hl.Contains(tagMessageID))
                 {
@@ -109,7 +109,5 @@ namespace Engine
                 "Mail Version: " + mailVersion + System.Environment.NewLine +
                 "Mail User: " + mailUser + System.Environment.NewLine;
         }
-
-        
     }
 }
