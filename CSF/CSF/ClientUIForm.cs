@@ -27,7 +27,7 @@ namespace ClientUI
             if (!text.Equals(""))
             {
                 engine = new Engine.Engine(text);
-                outputTextBox.Text = engine.getEngineOutput();
+                outputTextBox.Text = engine.engineOutput;
             }
             else outputTextBox.Text = "";
         }

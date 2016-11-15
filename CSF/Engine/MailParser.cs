@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 
 namespace Engine
 {
     abstract class MailParser
     {
         public string emailHeader { private set; get; }
+        private string emailServerUsed { set; get; }
 
         //Variables after parsing the emailHeader
         public string mailServerIP { private set; get;}
@@ -19,25 +15,31 @@ namespace Engine
         public string userAgent { private set; get; }
         public string mailVersion { private set; get; }
         public string mailUser { private set; get; }
+        public string mailApp { private set; get; }
+        public string mailLang { private set; get; }
 
         //Variables to know what to parse from
-        public string tagEmailHeader { private set; get; }
-        public string tagMailServerIP { private set; get; }
-        public string tagMessageID { private set; get; }
-        public string tagFrom { private set; get; }
-        public string tagFromIP { private set; get; }
-        public string tagUserAgent { private set; get; }
-        public string tagMailVersion { private set; get; }
-        public string tagMailUser { private set; get; }
+        private string tagEmailHeader { set; get; }
+        private string tagMailServerIP { set; get; }
+        private string tagMessageID { set; get; }
+        private string tagFrom { set; get; }
+        private string tagFromIP { set; get; }
+        private string tagUserAgent { set; get; }
+        private string tagMailVersion { set; get; }
+        private string tagMailUser { set; get; }
+        private string tagMailApp { set; get; }
+        private string tagMailLang { set; get; }
 
         /// <summary>
         /// Input: emailHeader & Email header tags
         /// Stores: All the header's data
         /// </summary>
-        public MailParser(string emailHeader, string _tagMailServerIP, string _tagMessageID, string _tagFrom,
-                        string _tagFromIP, string _tagUserAgent, string _tagMailVersion, string _tagMailUser) {
+        public MailParser(string _emailHeader,string _emailServerUsed, string _tagMailServerIP, string _tagMessageID, string _tagFrom,
+                        string _tagFromIP, string _tagUserAgent, string _tagMailVersion, string _tagMailUser,
+                        string _tagMailApp, string _tagMailLang) {
 
-            this.emailHeader = emailHeader;
+            this.emailHeader = _emailHeader;
+            this.emailServerUsed = _emailServerUsed;
 
             this.tagMailServerIP = _tagMailServerIP;
             this.tagMessageID = _tagMessageID;
@@ -46,6 +48,8 @@ namespace Engine
             this.tagUserAgent = _tagUserAgent;
             this.tagMailVersion = _tagMailVersion;
             this.tagMailUser = _tagMailUser;
+            this.tagMailApp = _tagMailApp;
+            this.tagMailLang = _tagMailLang;
 
             parseAllTags();
         }
@@ -61,7 +65,9 @@ namespace Engine
 
                 if (hl.Contains(tagMailServerIP)) {
                     index = hl.IndexOf(tagMailServerIP);
-                    mailServerIP += hl.Substring(index + tagMailServerIP.Length) + System.Environment.NewLine;
+                    if(mailServerIP == null)
+                        mailServerIP = hl.Substring(index + tagMailServerIP.Length); 
+                    else mailServerIP += System.Environment.NewLine + hl.Substring(index + tagMailServerIP.Length); 
                 }
                 if (hl.Contains(tagMessageID))
                 {
@@ -93,6 +99,16 @@ namespace Engine
                     index = hl.IndexOf(tagMailUser);
                     mailUser = hl.Substring(index + tagMailUser.Length);
                 }
+                if (hl.Contains(tagMailApp))
+                {
+                    index = hl.IndexOf(tagMailApp);
+                    mailApp = hl.Substring(index + tagMailApp.Length);
+                }
+                if (hl.Contains(tagMailLang))
+                {
+                    index = hl.IndexOf(tagMailLang);
+                    mailLang = hl.Substring(index + tagMailLang.Length);
+                }
             }
 
         }
@@ -100,14 +116,29 @@ namespace Engine
         /// <summary>
         /// Return all tags by string
         /// </summary>
-        public virtual string getAllTags() {
-            return "Server IP: " + mailServerIP + System.Environment.NewLine +
-                "Message ID: " + messageID + System.Environment.NewLine +
-                "From: " + from + System.Environment.NewLine +
-                "From IP: " + fromIP + System.Environment.NewLine +
-                "User Agent: " + userAgent + System.Environment.NewLine +
-                "Mail Version: " + mailVersion + System.Environment.NewLine +
-                "Mail User: " + mailUser + System.Environment.NewLine;
+        public virtual string getAllTags()
+        {
+            string allTags = "The email header refers to " + emailServerUsed + " server." + System.Environment.NewLine + System.Environment.NewLine;
+            if (!(mailServerIP == null))
+                allTags += emailServerUsed + " server(s) IP: " + mailServerIP + System.Environment.NewLine;
+            if (!(messageID == null))
+                allTags += "MessageID on " + emailServerUsed + ": " + messageID + System.Environment.NewLine;
+            if (!(from == null))
+                allTags += "From: " + from + System.Environment.NewLine;
+            if (!(fromIP == null))
+                allTags += "From IP: " + fromIP + System.Environment.NewLine;
+            if (!(userAgent == null))
+                allTags += "User Agent: " + userAgent + System.Environment.NewLine;
+            if (!(mailVersion == null))
+                allTags += "Mail Version: " + mailVersion + System.Environment.NewLine;
+            if (!(mailUser == null))
+                allTags += "Mail User: " + mailUser + System.Environment.NewLine;
+            if (!(mailApp == null))
+                allTags += "Mail App used: " + mailApp + System.Environment.NewLine;
+            if (!(mailLang == null))
+                allTags += "Language of the App used: " + mailLang + System.Environment.NewLine;
+
+            return allTags;
         }
     }
 }

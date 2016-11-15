@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Engine
+﻿namespace Engine
 {
     class SapoMailServer : MailParser
     {
-        public SapoMailServer(string emailHeader) : base(emailHeader, "X-PTMail-RemoteIP:", "Message-ID:", "From:",
-                                                    "X-Originating-IP:", "User-Agent:", "X-PTMail-Version:", "X-PTMail-User:"){ }
+        /// <summary>
+        /// SapoMailServer tags that give us the information.
+        /// The 2 last tags refers to an email sent from outlook
+        /// </summary>
+        public SapoMailServer(string emailHeader) : base(emailHeader, "Sapo", "X-PTMail-RemoteIP:", "Message-ID:", "From:",
+                                                    "X-Originating-IP:", "User-Agent:", "X-PTMail-Version:", "X-PTMail-User:", "X-Mailer: ", "Content-Language: ")
+        { }
     }
 }
