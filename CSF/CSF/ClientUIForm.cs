@@ -24,9 +24,10 @@ namespace ClientUI
             String text = null;
 
             text = this.textBoxEmailHeader.Text;
-            if (!text.Equals(""))
+            String mailType = this.comboBox1.Text;
+            if (!text.Equals("") && !mailType.Equals(""))
             {
-                engine = new Engine.Engine(text);
+                engine = new Engine.Engine(text, mailType);
                 outputTextBox.Text = engine.engineOutput;
             }
             else outputTextBox.Text = "";
@@ -38,6 +39,11 @@ namespace ClientUI
         }
 
         private void textOutput_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
 
         }

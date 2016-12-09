@@ -2,12 +2,13 @@
 {
     class GmailServer : MailParser
     {
-        /// <summary>
-        /// GmailServer has too little information, this constructor is WRONG!
-        /// Add the proper tags
+        /// <summary> 
+        /// GmailServer tags that give us the information relative to the header.
+        /// The 2 last tags refers to an email sent from outlook
+        /// !-! case there is no information
         /// </summary>
-        public GmailServer(string emailHeader) : base(emailHeader, "Gmail", "Received: from", "Message-ID:", "From:",
-                                                    "CMM-sender-ip:", "User-Agent:", "X-PTMail-Version:", "X-PTMail-User:", "", "")
+        public GmailServer(string emailHeader) : base(emailHeader, "Gmail", "Received: by ", "Message-ID: ", "From: ",
+                                                    "To: ", "!-!", "!-!", "!-!", "!-!", "!-!", "!-!")
         { }
     }
 }

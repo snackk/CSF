@@ -11,6 +11,7 @@ namespace Engine
         public string mailServerIP { private set; get;}
         public string messageID { private set; get; }
         public string from { private set; get; }
+        public string to { private set; get; }
         public string fromIP { private set; get; }
         public string userAgent { private set; get; }
         public string mailVersion { private set; get; }
@@ -23,6 +24,7 @@ namespace Engine
         private string tagMailServerIP { set; get; }
         private string tagMessageID { set; get; }
         private string tagFrom { set; get; }
+        private string tagTo { set; get; }
         private string tagFromIP { set; get; }
         private string tagUserAgent { set; get; }
         private string tagMailVersion { set; get; }
@@ -31,10 +33,13 @@ namespace Engine
         private string tagMailLang { set; get; }
 
         /// <summary>
-        /// Input: emailHeader & Email header tags
-        /// Stores: All the header's data
+        /// MailParser receives string arguments, in case of none, pass "!-!"
+        /// @Argument _emailHeader -> Email header
+        /// @Argument _emailServerUsed -> Email server used
+        /// @Argument _tagMailServerIP -> What's your server's IP
+        /// @Argument _tagMessageID -> Message ID on the server
         /// </summary>
-        public MailParser(string _emailHeader,string _emailServerUsed, string _tagMailServerIP, string _tagMessageID, string _tagFrom,
+        public MailParser(string _emailHeader,string _emailServerUsed, string _tagMailServerIP, string _tagMessageID, string _tagFrom, string _tagTo,
                         string _tagFromIP, string _tagUserAgent, string _tagMailVersion, string _tagMailUser,
                         string _tagMailApp, string _tagMailLang) {
 
@@ -44,10 +49,12 @@ namespace Engine
             this.tagMailServerIP = _tagMailServerIP;
             this.tagMessageID = _tagMessageID;
             this.tagFrom = _tagFrom;
+            this.tagTo = _tagTo;
             this.tagFromIP = _tagFromIP;
             this.tagUserAgent = _tagUserAgent;
             this.tagMailVersion = _tagMailVersion;
             this.tagMailUser = _tagMailUser;
+
             this.tagMailApp = _tagMailApp;
             this.tagMailLang = _tagMailLang;
 
@@ -62,6 +69,9 @@ namespace Engine
             string[] header_lines = Regex.Split(emailHeader, "\r\n|\r|\n");
 
             foreach(string hl in header_lines) {
+
+                if (hl.Contains("!-!"))
+                    continue;
 
                 if (hl.Contains(tagMailServerIP)) {
                     index = hl.IndexOf(tagMailServerIP);
@@ -78,6 +88,11 @@ namespace Engine
                 {
                     index = hl.IndexOf(tagFrom);
                     from = hl.Substring(index + tagFrom.Length);
+                }
+                if (hl.Contains(tagTo))
+                {
+                    index = hl.IndexOf(tagTo);
+                    to = hl.Substring(index + tagTo.Length);
                 }
                 if (hl.Contains(tagFromIP))
                 {
@@ -125,6 +140,8 @@ namespace Engine
                 allTags += "MessageID on " + emailServerUsed + ": " + messageID + System.Environment.NewLine;
             if (!(from == null))
                 allTags += "From: " + from + System.Environment.NewLine;
+            if (!(to == null))
+                allTags += "To: " + to + System.Environment.NewLine;
             if (!(fromIP == null))
                 allTags += "From IP: " + fromIP + System.Environment.NewLine;
             if (!(userAgent == null))

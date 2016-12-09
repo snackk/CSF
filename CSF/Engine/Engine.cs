@@ -12,16 +12,26 @@ namespace Engine
     {
         private MailParser server { set; get; } = null;
         public String engineOutput { private set; get; } = "";
-        private List<MailParser> servers = new List<MailParser>();
 
         /// <summary>
         /// Engine should test each server and choose the one which gives the most significant data.
         /// </summary>
-        public Engine(string mailHeader) {
-            servers.Add(new SapoMailServer(mailHeader));
-            servers.Add(new HotmailMailServer(mailHeader));
-            servers.Add(new GmailServer(mailHeader));
-
+        public Engine(string mailHeader, string emailToCreate) {
+            switch (emailToCreate) {
+                case "Gmail":
+                    server = new GmailServer(mailHeader);
+                    break;
+                case "Hotmail":
+                    server = new HotmailMailServer(mailHeader);
+                    break;
+                case "Sapo":
+                    server = new SapoMailServer(mailHeader);
+                    break;
+                case "IST":
+                    server = new ISTMailServer(mailHeader);
+                    break;
+            }
+            
             getEngineOutput();
         }
 
@@ -53,28 +63,35 @@ namespace Engine
         /// Get a string of all tags.
         /// </summary>
         private void getEngineOutput() {
-            String temp;
-            foreach (MailParser mp in servers) {
-                temp = mp.getAllTags();
-                if (temp.Split('\n').Length > engineOutput.Split('\n').Length)
-                {
-                    engineOutput = temp;
-                    Console.WriteLine(temp.Length);
-                }
-            }
-            engineOutput = "";
-            engineOutput += test("smtp.tecnico.ulisboa.pt");
-            string[] ola = GetMxRecordsByDomain("gmail.com");
-            for (int i = 0; i < ola.Length; i++) {
-                engineOutput += ola[i]+Environment.NewLine;
-                //engineOutput += test(ola[i]);
-            }
-        }
-        private string test(string eachMXserver)
-        {
-            string val = "";
+            /* String temp;
+             foreach (MailParser mp in servers) {
+                 temp = mp.getAllTags();
+                 if (temp.Split('\n').Length > engineOutput.Split('\n').Length)
+                 {
+                     engineOutput = temp;
+                     Console.WriteLine(temp.Length);
+                 }
+             }
+             engineOutput = "";
+             test("smtp.tecnico.ulisboa.pt", "ist173972", "diogo.p.dos.santos@ist.utl.pt"))
+             string[] ola = GetMxRecordsByDomain("gmail.com");
+             for (int i = 0; i < ola.Length; i++) {
+                 engineOutput += ola[i]+Environment.NewLine;
+             }*/
 
-            TcpClient tClient = new TcpClient(eachMXserver, 25);
+            engineOutput = server.getAllTags(); 
+        }
+
+        private bool test(string eachMXserver, string heloUsername, string mailTest){
+            TcpClient tClient = null;
+            try
+            {
+                 tClient = new TcpClient(eachMXserver, 25);
+            }
+            catch (SocketException e) {
+                Console.WriteLine("Could not connect on port 25 to " + eachMXserver + Environment.NewLine);
+                return false;
+            }
             string CRLF = "\r\n";
             byte[] dataBuffer;
             string ResponseString;
@@ -83,28 +100,27 @@ namespace Engine
             ResponseString = reader.ReadLine();
 
             /* Perform HELO to SMTP Server and get Response */
-            dataBuffer = BytesFromString("HELO ist173972" + CRLF);
+            dataBuffer = BytesFromString("HELO" + heloUsername + CRLF);
             netStream.Write(dataBuffer, 0, dataBuffer.Length);
             ResponseString = reader.ReadLine();
-            dataBuffer = BytesFromString("MAIL FROM:<diasogo.p.dos.santos@ist.utl.pt>" + CRLF);
+            dataBuffer = BytesFromString("MAIL FROM:<diogo.p.dos.santos@ist.utl.pt>" + CRLF);/*DOENST NECESSARY NEEDS TO EXIST*/
             netStream.Write(dataBuffer, 0, dataBuffer.Length);
             ResponseString = reader.ReadLine();
             /* Read Response of the RCPT TO Message to know from google if it exist or not */
-            dataBuffer = BytesFromString("RCPT TO:<" + "diogo.p.dos.santos@ist.utl.pt" + ">" + CRLF);
+            dataBuffer = BytesFromString("RCPT TO:<" + mailTest + ">" + CRLF);
             netStream.Write(dataBuffer, 0, dataBuffer.Length);
             ResponseString = reader.ReadLine();
 
-             val = "does exist";
             if (GetResponseCode(ResponseString) == 550)
                 {
-                /*DOES NOT EXIST*/
-                val = "does not exist";
+                return false;
                 }
-                /* QUITE CONNECTION */
-                dataBuffer = BytesFromString("QUITE" + CRLF);
-                netStream.Write(dataBuffer, 0, dataBuffer.Length);
-                tClient.Close();
-            return val;
+            /* QUITE CONNECTION */
+            dataBuffer = BytesFromString("QUITE" + CRLF);
+            netStream.Write(dataBuffer, 0, dataBuffer.Length);
+            tClient.Close();
+
+            return true;
             }
         
         private byte[] BytesFromString(string str)
