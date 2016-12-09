@@ -93,14 +93,14 @@ namespace Engine
 
             string[] mxs = GetMxRecordsByDomain(domain);
             for (int i = 0; i < mxs.Length; i++) {
-                possOutout += "Using MX server " + mxs[i]+Environment.NewLine;
-                if (testForUserOnServer(mxs[i], user, user))
-                {
-                    passed = true;
-                    possOutout += "Email verified, " + user + " it exists!" + Environment.NewLine;
-                    break;
-                }
+                possOutout += "      ->MX server " + mxs[i]+Environment.NewLine;
              }
+            if (testForUserOnServer(mxs[0], "", user) || testForUserOnServer(mxs[0], user, user))
+            {
+                passed = true;
+                possOutout += Environment.NewLine + "Email verified, " + user + " exists!" + Environment.NewLine + Environment.NewLine;
+            }
+            
             if (passed)
                 engineOutput = possOutout + server.getAllTags();
             else engineOutput = server.getAllTags(); 
@@ -110,7 +110,18 @@ namespace Engine
             TcpClient tClient = null;
             try
             {
-                 tClient = new TcpClient(eachMXserver, 25);
+                // tClient = new TcpClient(eachMXserver, 25);
+
+                tClient = new TcpClient();
+                var result = tClient.BeginConnect(eachMXserver, 25, null, null);
+
+                var success = result.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(1));
+
+                if (!success)
+                {
+                    Console.WriteLine("Could not connect on port 25 to " + eachMXserver + Environment.NewLine);
+                    return false;
+                }
             }
             catch (SocketException e) {
                 Console.WriteLine("Could not connect on port 25 to " + eachMXserver + Environment.NewLine);
