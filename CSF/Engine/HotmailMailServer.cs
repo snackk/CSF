@@ -8,6 +8,6 @@
         /// !-! case there is no information
         /// </summary>
         public HotmailMailServer(string emailHeader) : base(emailHeader, "Hotmail", "Received: from", "Message-ID:", "From:", "To: ",
-                                                    "CMM-sender-ip:", "User-Agent:", "X-PTMail-Version:", "X-PTMail-User:", "!-!", "!-!"){ }
+                                                    "CMM-sender-ip: ", "User-Agent:", "X-PTMail-Version:", "X-PTMail-User:", "!-!", "!-!"){ }
     }
 }

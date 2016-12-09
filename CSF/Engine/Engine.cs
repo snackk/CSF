@@ -3,15 +3,19 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml;
 
 namespace Engine
 {
     public class Engine
     {
         private MailParser server { set; get; } = null;
+        private Dictionary<String, String> geoData = new Dictionary<string, string>();
+
         public String engineOutput { private set; get; } = "";
 
         /// <summary>
@@ -32,11 +36,66 @@ namespace Engine
                     server = new ISTMailServer(mailHeader);
                     break;
             }
-            
             getEngineOutput();
         }
 
-        public static String[] GetMxRecordsByDomain(String domain)
+        /// <summary>
+        /// Get a string of all tags.
+        /// </summary>
+        private void getEngineOutput() {
+            string domain = "";
+            string possOutout = "";
+            string geo = "";
+            string user = "";
+
+            switch (server.emailServerUsed) {
+                case "Sapo":
+                    domain = "sapo.pt";
+                    break;
+                case "Gmail":
+                    domain = "gmail.com";
+                    break;
+                case "Hotmail":
+                    domain = "hotmail.com";
+                    break;
+                case "IST":
+                    domain = "ist.utl.pt";
+                    break;
+            }
+
+            possOutout += "Result of nslookup -q=mx " + domain + Environment.NewLine;
+            Regex r = new Regex(@"<(.+?)>");
+            Match m = r.Match(server.from);
+            if (m.Success)
+                user = m.Groups[1].Value;
+           
+            bool passed = false;
+
+            string[] mxs = GetMxRecordsByDomain(domain);
+            for (int i = 0; i < mxs.Length; i++) {
+                possOutout += "      ->MX server " + mxs[i]+Environment.NewLine;
+             }
+            if (testForUserOnServer(mxs[0], "", user) || testForUserOnServer(mxs[0], user, user))
+            {
+                passed = true;
+                possOutout += Environment.NewLine + "      Email verified, " + user + " exists!" + Environment.NewLine;
+            }
+            
+            if (passed)
+                engineOutput = possOutout + "___________________________________________" + Environment.NewLine + server.getAllTags();
+            else engineOutput = server.getAllTags();
+
+            engineOutput += "___________________________________________" + Environment.NewLine;
+
+            getGeoData();
+            engineOutput += "Geodata collected" + Environment.NewLine;
+            foreach (KeyValuePair<string, string> entry in geoData)
+            {
+                engineOutput += "      ->" + entry.Key + ": " +  entry.Value + Environment.NewLine;
+            }
+        }
+
+        private String[] GetMxRecordsByDomain(String domain)
         {
             ProcessStartInfo start = new ProcessStartInfo("nslookup");
             start.RedirectStandardOutput = true;
@@ -60,58 +119,27 @@ namespace Engine
             return mx.ToArray();
         }
 
-        /// <summary>
-        /// Get a string of all tags.
-        /// </summary>
-        private void getEngineOutput() {
-            string domain = "";
-            string possOutout = "";
-            string user = "";
-
-            //test("smtp.tecnico.ulisboa.pt", "ist173972", "diogo.p.dos.santos@ist.utl.pt"))
-            switch (server.emailServerUsed) {
-                case "Sapo":
-                    domain = "sapo.pt";
-                    break;
-                case "Gmail":
-                    domain = "gmail.com";
-                    break;
-                case "Hotmail":
-                    domain = "hotmail.com";
-                    break;
-                case "IST":
-                    domain = "ist.utl.pt";
-                    break;
-            }
-            possOutout = "Result of nslookup -q=mx " + domain + Environment.NewLine;
-            Regex r = new Regex(@"<(.+?)>");
-            Match m = r.Match(server.from);
-            if (m.Success)
-                user = m.Groups[1].Value;
-
-            bool passed = false;
-
-            string[] mxs = GetMxRecordsByDomain(domain);
-            for (int i = 0; i < mxs.Length; i++) {
-                possOutout += "      ->MX server " + mxs[i]+Environment.NewLine;
-             }
-            if (testForUserOnServer(mxs[0], "", user) || testForUserOnServer(mxs[0], user, user))
+        private void getGeoData() {
+            string url = "http://ip-api.com/xml/" + server.fromIP;
+            WebClient wc = new WebClient();
+            wc.Proxy = null;
+            MemoryStream ms = new MemoryStream(wc.DownloadData(url));
+            XmlTextReader rdr = new XmlTextReader(url);
+            XmlDocument doc = new XmlDocument();
+            ms.Position = 0;
+            doc.Load(ms);
+            ms.Dispose();
+            foreach (XmlElement el in doc.ChildNodes[1].ChildNodes)
             {
-                passed = true;
-                possOutout += Environment.NewLine + "Email verified, " + user + " exists!" + Environment.NewLine + Environment.NewLine;
+                geoData.Add(el.Name, el.InnerText);
             }
-            
-            if (passed)
-                engineOutput = possOutout + server.getAllTags();
-            else engineOutput = server.getAllTags(); 
         }
 
         private bool testForUserOnServer(string eachMXserver, string heloUsername, string mailTest){
             TcpClient tClient = null;
+
             try
             {
-                // tClient = new TcpClient(eachMXserver, 25);
-
                 tClient = new TcpClient();
                 var result = tClient.BeginConnect(eachMXserver, 25, null, null);
 
@@ -141,6 +169,7 @@ namespace Engine
             dataBuffer = BytesFromString("MAIL FROM:<diogo.p.dos.santos@ist.utl.pt>" + CRLF);/*DOENST NECESSARY NEEDS TO EXIST*/
             netStream.Write(dataBuffer, 0, dataBuffer.Length);
             ResponseString = reader.ReadLine();
+
             /* Read Response of the RCPT TO Message to know from google if it exist or not */
             dataBuffer = BytesFromString("RCPT TO:<" + mailTest + ">" + CRLF);
             netStream.Write(dataBuffer, 0, dataBuffer.Length);
@@ -156,7 +185,7 @@ namespace Engine
             tClient.Close();
 
             return true;
-            }
+        }
         
         private byte[] BytesFromString(string str)
         {
@@ -167,6 +196,5 @@ namespace Engine
             return int.Parse(ResponseString.Substring(0, 3));
         }
     }
-
-    }
+}
 

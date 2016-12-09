@@ -133,27 +133,27 @@ namespace Engine
         /// </summary>
         public virtual string getAllTags()
         {
-            string allTags = "The email header refers to " + emailServerUsed + " server." + System.Environment.NewLine + System.Environment.NewLine;
+            string allTags = "The email header refers to " + emailServerUsed + " server." + System.Environment.NewLine;
             if (!(mailServerIP == null))
-                allTags += emailServerUsed + " server(s) IP: " + mailServerIP + System.Environment.NewLine;
+                allTags += "      ->" + emailServerUsed + " server(s) IP: " + mailServerIP + System.Environment.NewLine;
             if (!(messageID == null))
-                allTags += "MessageID on " + emailServerUsed + ": " + messageID + System.Environment.NewLine;
+                allTags += "      ->" + "MessageID on " + emailServerUsed + ": " + messageID + System.Environment.NewLine;
             if (!(from == null))
-                allTags += "From: " + from + System.Environment.NewLine;
+                allTags += "      ->" + "From: " + from + System.Environment.NewLine;
             if (!(to == null))
-                allTags += "To: " + to + System.Environment.NewLine;
+                allTags += "      ->" + "To: " + to + System.Environment.NewLine;
             if (!(fromIP == null))
-                allTags += "From IP: " + fromIP + System.Environment.NewLine;
+                allTags += "      ->" + "From IP: " + fromIP + System.Environment.NewLine;
             if (!(userAgent == null))
-                allTags += "User Agent: " + userAgent + System.Environment.NewLine;
+                allTags += "      ->" + "User Agent: " + userAgent + System.Environment.NewLine;
             if (!(mailVersion == null))
-                allTags += "Mail Version: " + mailVersion + System.Environment.NewLine;
+                allTags += "      ->" + "Mail Version: " + mailVersion + System.Environment.NewLine;
             if (!(mailUser == null))
-                allTags += "Mail User: " + mailUser + System.Environment.NewLine;
+                allTags += "      ->" + "Mail User: " + mailUser + System.Environment.NewLine;
             if (!(mailApp == null))
-                allTags += "Mail App used: " + mailApp + System.Environment.NewLine;
+                allTags += "      ->" + "Mail App used: " + mailApp + System.Environment.NewLine;
             if (!(mailLang == null))
-                allTags += "Language of the App used: " + mailLang + System.Environment.NewLine;
+                allTags += "      ->" + "Language of the App used: " + mailLang + System.Environment.NewLine;
 
             return allTags;
         }

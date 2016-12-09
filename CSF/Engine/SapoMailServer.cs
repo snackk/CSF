@@ -8,7 +8,7 @@
         /// !-! case there is no information
         /// </summary>
         public SapoMailServer(string emailHeader) : base(emailHeader, "Sapo", "X-PTMail-RemoteIP:", "Message-ID:", "From:", "To: ",
-                                                    "X-Originating-IP:", "User-Agent:", "X-PTMail-Version:", "X-PTMail-User:", "X-Mailer: ", "Content-Language: ")
+                                                    "X-Originating-IP: ::ffff:", "User-Agent:", "X-PTMail-Version:", "X-PTMail-User:", "X-Mailer: ", "Content-Language: ")
         { }
     }
 }
