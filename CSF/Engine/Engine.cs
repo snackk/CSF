@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Engine
 {
@@ -63,26 +64,49 @@ namespace Engine
         /// Get a string of all tags.
         /// </summary>
         private void getEngineOutput() {
-            /* String temp;
-             foreach (MailParser mp in servers) {
-                 temp = mp.getAllTags();
-                 if (temp.Split('\n').Length > engineOutput.Split('\n').Length)
-                 {
-                     engineOutput = temp;
-                     Console.WriteLine(temp.Length);
-                 }
-             }
-             engineOutput = "";
-             test("smtp.tecnico.ulisboa.pt", "ist173972", "diogo.p.dos.santos@ist.utl.pt"))
-             string[] ola = GetMxRecordsByDomain("gmail.com");
-             for (int i = 0; i < ola.Length; i++) {
-                 engineOutput += ola[i]+Environment.NewLine;
-             }*/
+            string domain = "";
+            string possOutout = "";
+            string user = "";
 
-            engineOutput = server.getAllTags(); 
+            //test("smtp.tecnico.ulisboa.pt", "ist173972", "diogo.p.dos.santos@ist.utl.pt"))
+            switch (server.emailServerUsed) {
+                case "Sapo":
+                    domain = "sapo.pt";
+                    break;
+                case "Gmail":
+                    domain = "gmail.com";
+                    break;
+                case "Hotmail":
+                    domain = "hotmail.com";
+                    break;
+                case "IST":
+                    domain = "ist.utl.pt";
+                    break;
+            }
+            possOutout = "Result of nslookup -q=mx " + domain + Environment.NewLine;
+            Regex r = new Regex(@"<(.+?)>");
+            Match m = r.Match(server.from);
+            if (m.Success)
+                user = m.Groups[1].Value;
+
+            bool passed = false;
+
+            string[] mxs = GetMxRecordsByDomain(domain);
+            for (int i = 0; i < mxs.Length; i++) {
+                possOutout += "Using MX server " + mxs[i]+Environment.NewLine;
+                if (testForUserOnServer(mxs[i], user, user))
+                {
+                    passed = true;
+                    possOutout += "Email verified, " + user + " it exists!" + Environment.NewLine;
+                    break;
+                }
+             }
+            if (passed)
+                engineOutput = possOutout + server.getAllTags();
+            else engineOutput = server.getAllTags(); 
         }
 
-        private bool test(string eachMXserver, string heloUsername, string mailTest){
+        private bool testForUserOnServer(string eachMXserver, string heloUsername, string mailTest){
             TcpClient tClient = null;
             try
             {

@@ -5,7 +5,7 @@ namespace Engine
     abstract class MailParser
     {
         public string emailHeader { private set; get; }
-        private string emailServerUsed { set; get; }
+        public string emailServerUsed {private set; get; }
 
         //Variables after parsing the emailHeader
         public string mailServerIP { private set; get;}
