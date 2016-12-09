@@ -2,7 +2,7 @@
 {
     class SapoMailServer : MailParser
     {
-        /// <summary>
+        /// <summary> 
         /// SapoMailServer tags that give us the information.
         /// The 2 last tags refers to an email sent from outlook
         /// </summary>
