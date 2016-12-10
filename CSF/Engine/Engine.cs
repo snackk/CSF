@@ -193,6 +193,8 @@ namespace Engine
         }
         private int GetResponseCode(string ResponseString)
         {
+            if (ResponseString == null)
+                return 550;
             return int.Parse(ResponseString.Substring(0, 3));
         }
     }
