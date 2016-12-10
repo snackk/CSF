@@ -22,17 +22,17 @@ namespace Engine
         /// Engine should test each server and choose the one which gives the most significant data.
         /// </summary>
         public Engine(string mailHeader, string emailToCreate) {
-            switch (emailToCreate) {
-                case "Gmail":
+            switch (emailToCreate.ToLower()) {
+                case "gmail":
                     server = new GmailServer(mailHeader);
                     break;
-                case "Hotmail":
+                case "hotmail":
                     server = new HotmailMailServer(mailHeader);
                     break;
-                case "Sapo":
+                case "sapo":
                     server = new SapoMailServer(mailHeader);
                     break;
-                case "IST":
+                case "ist":
                     server = new ISTMailServer(mailHeader);
                     break;
             }
@@ -48,26 +48,27 @@ namespace Engine
             string user = server.from;
             string domain = server.getDomain();
 
-            possOutout += "Result of nslookup -q=mx " + domain + Environment.NewLine;
+            engineOutput += "Result of nslookup -q=mx " + domain + Environment.NewLine;
            
             bool passed = false;
 
             string[] mxs = GetMxRecordsByDomain(domain);
             for (int i = 0; i < mxs.Length; i++) {
-                possOutout += "      ->MX server " + mxs[i]+Environment.NewLine;
+                engineOutput += "      ->MX server " + mxs[i]+Environment.NewLine;
              }
+            engineOutput += Environment.NewLine;
             if (mxs.Length != 0)
             {
                 if (testForUserOnServer(mxs[0], "", user) || testForUserOnServer(mxs[0], user, user))
                 {
                     passed = true;
-                    possOutout += Environment.NewLine + "      Email verified, " + user + " exists!" + Environment.NewLine;
+                    possOutout += "        Email verified, " + user + " exists!" + Environment.NewLine;
                 }
             }
             
             if (passed)
-                engineOutput = possOutout + "___________________________________________" + Environment.NewLine + server.getAllTags();
-            else engineOutput = server.getAllTags();
+                engineOutput += possOutout + "___________________________________________" + Environment.NewLine + server.getAllTags();
+            else engineOutput += "        Couldn't verify if email exists." + Environment.NewLine + "___________________________________________" + Environment.NewLine + server.getAllTags();
 
             if (server.fromIP != null)
             {
