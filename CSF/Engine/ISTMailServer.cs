@@ -14,7 +14,12 @@ namespace Engine
         /// !-! case there is no information
         /// </summary>
         public ISTMailServer(string emailHeader) : base(emailHeader, "IST", "!-!", "Message-ID:", "From: ", "To: ",
-                                                    "!-!", "User-Agent: ", "!-!", "!-!", "!-! ", "!-!")
+                                                    "Received: from ", "User-Agent: ", "!-!", "!-!", "!-! ", "!-!")
         { }
+
+        public override string getDomain()
+        {
+            return "tecnico.ulisboa.pt";
+        }
     }
 }

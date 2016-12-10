@@ -59,6 +59,19 @@ namespace Engine
             this.tagMailLang = _tagMailLang;
 
             parseAllTags();
+            removeInvalidFromEmail();
+        }
+
+        public abstract string getDomain();
+
+        private void removeInvalidFromEmail() {
+            if (from.Contains("<"))
+            {
+                Regex r = new Regex(@"<(.+?)>");
+                Match m = r.Match(from);
+                if (m.Success)
+                    from = m.Groups[1].Value;
+            }
         }
 
         /// <summary>

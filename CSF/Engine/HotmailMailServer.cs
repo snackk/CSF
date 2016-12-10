@@ -1,4 +1,6 @@
-﻿namespace Engine
+﻿using System;
+
+namespace Engine
 {
     class HotmailMailServer : MailParser
     {
@@ -9,5 +11,10 @@
         /// </summary>
         public HotmailMailServer(string emailHeader) : base(emailHeader, "Hotmail", "Received: from", "Message-ID:", "From:", "To: ",
                                                     "CMM-sender-ip: ", "User-Agent:", "X-PTMail-Version:", "X-PTMail-User:", "!-!", "!-!"){ }
+
+        public override string getDomain()
+        {
+            return "hotmail.com";
+        }
     }
 }

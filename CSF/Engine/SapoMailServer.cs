@@ -1,4 +1,6 @@
-﻿namespace Engine
+﻿using System;
+
+namespace Engine
 {
     class SapoMailServer : MailParser
     {
@@ -10,5 +12,10 @@
         public SapoMailServer(string emailHeader) : base(emailHeader, "Sapo", "X-PTMail-RemoteIP:", "Message-ID:", "From:", "To: ",
                                                     "X-Originating-IP: ::ffff:", "User-Agent:", "X-PTMail-Version:", "X-PTMail-User:", "X-Mailer: ", "Content-Language: ")
         { }
+
+        public override string getDomain()
+        {
+            return "sapo.pt";
+        }
     }
 }

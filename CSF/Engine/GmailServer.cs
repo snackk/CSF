@@ -1,4 +1,6 @@
-﻿namespace Engine
+﻿using System;
+
+namespace Engine
 {
     class GmailServer : MailParser
     {
@@ -10,5 +12,10 @@
         public GmailServer(string emailHeader) : base(emailHeader, "Gmail", "Received: by ", "Message-ID: ", "From: ",
                                                     "To: ", "!-!", "!-!", "!-!", "!-!", "!-!", "!-!")
         { }
+
+        public override string getDomain()
+        {
+            return "gmail.com";
+        }
     }
 }

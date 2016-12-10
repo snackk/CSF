@@ -43,31 +43,12 @@ namespace Engine
         /// Get a string of all tags.
         /// </summary>
         private void getEngineOutput() {
-            string domain = "";
             string possOutout = "";
             string geo = "";
-            string user = "";
-
-            switch (server.emailServerUsed) {
-                case "Sapo":
-                    domain = "sapo.pt";
-                    break;
-                case "Gmail":
-                    domain = "gmail.com";
-                    break;
-                case "Hotmail":
-                    domain = "hotmail.com";
-                    break;
-                case "IST":
-                    domain = "ist.utl.pt";
-                    break;
-            }
+            string user = server.from;
+            string domain = server.getDomain();
 
             possOutout += "Result of nslookup -q=mx " + domain + Environment.NewLine;
-            Regex r = new Regex(@"<(.+?)>");
-            Match m = r.Match(server.from);
-            if (m.Success)
-                user = m.Groups[1].Value;
            
             bool passed = false;
 
@@ -75,23 +56,28 @@ namespace Engine
             for (int i = 0; i < mxs.Length; i++) {
                 possOutout += "      ->MX server " + mxs[i]+Environment.NewLine;
              }
-            if (testForUserOnServer(mxs[0], "", user) || testForUserOnServer(mxs[0], user, user))
+            if (mxs.Length != 0)
             {
-                passed = true;
-                possOutout += Environment.NewLine + "      Email verified, " + user + " exists!" + Environment.NewLine;
+                if (testForUserOnServer(mxs[0], "", user) || testForUserOnServer(mxs[0], user, user))
+                {
+                    passed = true;
+                    possOutout += Environment.NewLine + "      Email verified, " + user + " exists!" + Environment.NewLine;
+                }
             }
             
             if (passed)
                 engineOutput = possOutout + "___________________________________________" + Environment.NewLine + server.getAllTags();
             else engineOutput = server.getAllTags();
 
-            engineOutput += "___________________________________________" + Environment.NewLine;
-
-            getGeoData();
-            engineOutput += "Geodata collected" + Environment.NewLine;
-            foreach (KeyValuePair<string, string> entry in geoData)
+            if (server.fromIP != null)
             {
-                engineOutput += "      ->" + entry.Key + ": " +  entry.Value + Environment.NewLine;
+                engineOutput += "___________________________________________" + Environment.NewLine;
+                getGeoData();
+                engineOutput += "Geodata collected" + Environment.NewLine;
+                foreach (KeyValuePair<string, string> entry in geoData)
+                {
+                    engineOutput += "      ->" + entry.Key + ": " + entry.Value + Environment.NewLine;
+                }
             }
         }
 
@@ -137,7 +123,7 @@ namespace Engine
 
         private bool testForUserOnServer(string eachMXserver, string heloUsername, string mailTest){
             TcpClient tClient = null;
-
+            bool exists = false;
             try
             {
                 tClient = new TcpClient();
@@ -166,25 +152,30 @@ namespace Engine
             dataBuffer = BytesFromString("HELO" + heloUsername + CRLF);
             netStream.Write(dataBuffer, 0, dataBuffer.Length);
             ResponseString = reader.ReadLine();
-            dataBuffer = BytesFromString("MAIL FROM:<diogo.p.dos.santos@ist.utl.pt>" + CRLF);/*DOENST NECESSARY NEEDS TO EXIST*/
+            dataBuffer = BytesFromString("MAIL FROM:<" + mailTest + ">" + CRLF);/*DOENST NECESSARY NEEDS TO EXIST*/
             netStream.Write(dataBuffer, 0, dataBuffer.Length);
             ResponseString = reader.ReadLine();
 
-            /* Read Response of the RCPT TO Message to know from google if it exist or not */
-            dataBuffer = BytesFromString("RCPT TO:<" + mailTest + ">" + CRLF);
-            netStream.Write(dataBuffer, 0, dataBuffer.Length);
-            ResponseString = reader.ReadLine();
+            if (GetResponseCode(ResponseString) == 220)
+            {
+                /* Read Response of the RCPT TO Message to know from google if it exist or not */
+                dataBuffer = BytesFromString("RCPT TO:<" + mailTest + ">" + CRLF);
+                netStream.Write(dataBuffer, 0, dataBuffer.Length);
+                ResponseString = reader.ReadLine();
 
-            if (GetResponseCode(ResponseString) == 550)
+                if (GetResponseCode(ResponseString) == 250)
                 {
-                return false;
+                    exists = true;
                 }
-            /* QUITE CONNECTION */
-            dataBuffer = BytesFromString("QUITE" + CRLF);
-            netStream.Write(dataBuffer, 0, dataBuffer.Length);
-            tClient.Close();
+                /* QUITE CONNECTION */
+                dataBuffer = BytesFromString("QUITE" + CRLF);
+                netStream.Write(dataBuffer, 0, dataBuffer.Length);
+                tClient.Close();
+            }
 
-            return true;
+            if (exists)
+                return true;
+            else return false;
         }
         
         private byte[] BytesFromString(string str)
@@ -193,8 +184,6 @@ namespace Engine
         }
         private int GetResponseCode(string ResponseString)
         {
-            if (ResponseString == null)
-                return 550;
             return int.Parse(ResponseString.Substring(0, 3));
         }
     }
